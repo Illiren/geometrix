@@ -86,8 +86,7 @@ namespace _OptimizerInternal
     {
         return _xgetbv(x);
     }
-    ////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////
+    
     //  Detect 64-bit - Note that this snippet of code for detecting 64-bit has been copied from MSDN.
     typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
     BOOL IsWow64()

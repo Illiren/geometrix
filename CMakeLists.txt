@@ -13,33 +13,41 @@ add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    
+# Set compiler options
 target_compile_features(project_options INTERFACE cxx_std_20)
-
 # for clang and gcc add -mfma and for msvc /fp:fast
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options("-march=native")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options("/fp:fast")
 endif()
-
+if (CMAKE_BUILD_TYPE MATCHES "Release")
+	add_compile_options(-O3 -DNDEBUG)
+endif()
 
 # Build tests
 option(ENABLE_TESTING "Enable Test Builds" ON)
+option(ENABLE_BENCH "Enable Benchmark Builds" OFF)
 
-if(ENABLE_TESTING)
-  message(
-    "Building Tests."
-  )
+if(ENABLE_TESTING OR ENABLE_BENCH)
   add_subdirectory(tests)
-  add_test(SinCosTest tests/SinCosTest 1)
-  add_test(MatrixTest tests/MatrixTest 2)
-  add_test(OptimizerTest tests/OptimizerTest 3)
-  add_test(TrigBenchmark tests/TrigBenchmark 4)
   enable_testing()
 endif()
+if(ENABLE_TESTING)
+  message("Building Unit Tests.")
+  add_test(Sin/Cos_Unit_Tests tests/test_sin_cos)
+  add_test(Tangent/ArcTangent_Unit_Tests tests/test_tan_atan)
+  add_test(ArcSin/ArcCos_Unit_Tests tests/test_asin_acos)
+  add_test(Matrix_Unit_Tests tests/test_matrix)
+  add_test(Optimizer_Test tests/test_optimizer)
+endif()
+if(ENABLE_BENCH)
+  message("Building Benchmarks.")
+  add_test(Trigonometry_Benchmark tests/bench_trigonometrix)
+endif()
 
-
-# Install library
+# Install the library
 include(GNUInstallDirs)
 
 install(TARGETS ${PROJECT_NAME}

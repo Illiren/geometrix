@@ -58,6 +58,9 @@ struct Matrix<T, 1, D>
         for (auto it : initList)
             _data[i++] = it;
     }
+    constexpr Matrix(const T& d) noexcept {
+        for (std::size_t i = Size; i--; _data[i] = d);
+    }
     constexpr Matrix(const T (&d)[Size]) noexcept {
         for (std::size_t i = Size; i--; _data[i] = d[i]);
     }
@@ -506,6 +509,7 @@ struct Matrix<T, 1, 2>
 
     constexpr Matrix() noexcept {}
     constexpr Matrix(Type x, Type y) noexcept : _data{x, y} {}
+    constexpr Matrix(T d) noexcept : _data{d, d} {}
     constexpr Matrix(const T (&d)[Size]) noexcept : _data{d[0], d[1]} {}
     constexpr Matrix(const Matrix &v) noexcept : _data{v._data[0], v._data[1]} {}
     constexpr Matrix(Matrix &&v) noexcept : _data{v._data[0], v._data[1]} {}
@@ -743,6 +747,7 @@ struct Matrix<T, 1, 3>
 
     constexpr Matrix() noexcept {}
     constexpr Matrix(Type x, Type y, Type z) noexcept : _data{x, y, z} {}
+    constexpr Matrix(T d) noexcept : _data{d, d, d} {}
     constexpr Matrix(const T (&d)[Size]) noexcept : _data{d[0], d[1], d[2]} {}
     constexpr Matrix(const Matrix &v) noexcept : _data{v._data[0], v._data[1], v._data[2]} {}
     constexpr Matrix(Matrix &&v) noexcept : _data{v._data[0], v._data[1], v._data[2]} {}
@@ -1013,6 +1018,7 @@ struct Matrix<T, 1, 4>
     constexpr Matrix(Type x, Type y, Type z, Type w) noexcept
         : _data{x, y, z, w}
     {}
+    constexpr Matrix(T d) noexcept : _data{d, d, d, d} {}
     constexpr Matrix(const T (&d)[Size]) noexcept
         : _data{d[0], d[1], d[2], d[3]}
     {}
@@ -2107,7 +2113,7 @@ protected:
 
 
 /*
- * Matrix specilization for 1,1
+ * Matrix specilization for 1x1
  * Don't ask me why, because i don't know
  */
 template <typename T>
@@ -2153,6 +2159,9 @@ struct Matrix<T, 1, 1>
         _data *= k;
     }
 
+    TData data() { return _data; }
+    TData data() const { return _data; }
+
     operator RData() { return _data; }
     operator CRData() const { return _data; }
 
@@ -2163,7 +2172,7 @@ struct Matrix<T, 1, 1>
         return newOne;
     }
     Matrix &operator-=(Matrix m) {
-        _data[0] -= m._data[0];
+        _data -= m._data;
         return *this;
     }
     Matrix &operator+=(Matrix m) {
@@ -2226,6 +2235,18 @@ bool operator!=(const Matrix<T, Row, Col> lhs, const Matrix<T, Row, Col> rhs)
         if (lhs[i] != rhs[i])
             return true;
     return false;
+}
+
+template <typename T>
+bool operator==(Matrix<T, 1, 1> lhs, Matrix<T, 1, 1> rhs)
+{
+    return lhs.data() == rhs.data();
+}
+
+template <typename T>
+bool operator!=(Matrix<T, 1, 1> lhs, Matrix<T, 1, 1> rhs)
+{
+    return lhs.data() != rhs.data();
 }
 
 

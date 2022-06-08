@@ -30,7 +30,7 @@ namespace Trig
  * Source: https://github.com/ruuda/convector/blob/master/tools/approx_acos.py
  * Accuracy: av abs error 3e-11, max abs error 0.0167, accuracy gets worse when aproaching the limits.
  * Up to 2 times faster than std, depending on compiler.
- * Returns the arccosine of a in the range [0,pi], expecting a to be in the range [-1,+1].
+ * Returns the arccosine of x in the range [0,pi], expecting x to be in the range [-1,+1].
 */
 template<typename T> constexpr T acos(T x) noexcept requires(std::is_floating_point_v<T>)
 {
@@ -53,7 +53,7 @@ template<typename T> constexpr auto acos(T x) noexcept requires(std::is_integral
 }
 
 // just a shifted version of acos implementation
-// Returns the arc cosine of a in the range [-pi/2,pi/2], expecting a to be in the range [-1,+1].
+// Returns the arc cosine of x in the range [-pi/2,pi/2], expecting x to be in the range [-1,+1].
 template<typename T> constexpr T asin(T x) noexcept requires(std::is_floating_point_v<T>)
 {
     return HALF_PI - acos<T>(x);
@@ -79,7 +79,7 @@ template<typename T> constexpr auto asin(T x) noexcept requires(std::is_integral
     // maps number of accurate significant needed to the max error value for constLUTSizeFromAcc
     // same values after 5 entry are due to compiler limitation for clang and gcc (at least)
     inline constexpr std::array<double,SIN_COS_ACC_MAP_COUNT> SC_LUT_ACC_MAP =
-    { 0.1,0.01,0.001,0.0001,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001 };
+    { 0.1,0.01,0.001,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001 };
 
     // Information for periodic function LUT generation
     template <typename T, T(*Func)(T), std::size_t foldingRatio, std::size_t acc>
@@ -174,11 +174,14 @@ constexpr auto sin(T x) noexcept requires (std::is_integral_v<T>);
 /*
  * Approximations of Sine/Cosine, where:
  * polyApprox - defines implementation, poly for polynomial, else LUT
- * accuracy - integer value in range 0..10(for LUT version only 0..4) that scales up the accuracy
+ * accuracy - integer value in range 0..10 that scales up the accuracy
  * of the approximation, where value stands for number of digits of accurary required
  * in fractional part of the result (i.e. to get 0.0xx accuracy choose accuracy=1,
  * so it guarantees that maximum absolute error will be lower than 0.1 on the argument range).
  * Better accuracy, leads to slower runtime (obviously)
+ * By default accuracy is maximum for a given data type and not limited by described digits of accuracy
+ * Warning: float versions has lower max accuracy ceiling 1E-7, so the accuracy hold at 0..5 range.
+ * Warning2: for LUT implementation accuracy is effective for only 0..3(with 0.00011 max error at 4))
 */
 template <typename T, std::size_t accuracy = sinCosAcc<T>, bool polyApprox = true>
 constexpr T cos(T x) noexcept requires(std::is_floating_point_v<T>)

@@ -1,4 +1,8 @@
-#include "../include/optimizer.hpp"
+/*
+ * Output CPU features and check for runtime errors
+ */
+
+#include "../../include/optimizer.hpp"
 #include <iostream>
 #include <cstring>
 

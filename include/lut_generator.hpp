@@ -1,7 +1,8 @@
 #pragma once
 /*
- * This file stores utilities for lookup teable generation and writing to a
- * header, depending on desired accuracy of approximation
+ * This file stores utilities for lookup table (LUT) generation
+ * (constexpr LUT and source code generating LUT),
+ * depending on the desired accuracy of approximation
 */
 #include <iostream>
 #include <ios>
@@ -20,8 +21,8 @@ constexpr int SIN_COS_FOLDING_RATIO = 8;
 
 /*
  * Monotonic lookup table generator.
- * size value is limited by compiler constexpr operations limit and can be modified
- * by setting appropriate compile flags
+ * size value is limited by compiler constexpr operations limit and can be
+ * modified by setting appropriate compile flags
  */
 template <typename T, typename Info, typename Generator>
 constexpr auto generateLUT(Generator&& f) noexcept
@@ -54,8 +55,8 @@ inline constexpr auto getLUT = generateLUT<T,Info>([](T arg, T prevValue)
 
 
 
-//========================= file generation ==================================//
-
+//========================= header file generation ===========================//
+// just an example look-up table header generator for sin/cos period type of function
 inline constexpr auto FLOAT_FNAME = "float_table.hpp";
 inline constexpr auto DOUBLE_FNAME = "double_table.hpp";
 inline constexpr auto FT_SIN_NAME = "SIN_TABLE_F";
@@ -66,7 +67,8 @@ inline constexpr auto FT_COS_NAME = "COS_TABLE_F";
 inline constexpr auto DT_COS_NAME = "COS_TABLE_D";
 inline constexpr auto FT_COS_GRAD_NAME = "COS_GRAD_F";
 inline constexpr auto DT_COS_GRAD_NAME = "COS_GRAD_D";
-// numbers of significant digits for precision
+// numbers of significant digits for stdout, which would be enough,
+// accuracy-wise
 inline constexpr int FLOAT_PREC_DIGITS = 12;
 inline constexpr int DOUBLE_PREC_DIGITS = 19;
 
@@ -197,7 +199,8 @@ static void generateSinCosTable()
     if constexpr (is_same<T, float>())
         size = tableSizeFromAcc(1E-9, SIN_COS_FOLDING_RATIO);
     else
-        size = tableSizeFromAcc(1E-11, SIN_COS_FOLDING_RATIO);// should be 1E-17 actually, but the table would be too enormous
+        size = tableSizeFromAcc(1E-11, SIN_COS_FOLDING_RATIO);
+    //actually, the size should be 1E-17, but the table would be too enormous
     assert(size > 0 && "invalid table size");
     const char* fileName;
     int precision;
